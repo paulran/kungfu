@@ -8,8 +8,20 @@ project(kungfu)
 include(.cmake/editor.cmake)
 include(.cmake/compiler.cmake)
 include(.cmake/libnode.cmake)
-include(build/conanbuildinfo.cmake)
-conan_basic_setup(KEEP_RPATHS NO_OUTPUT_DIRS SKIP_STD SKIP_FPIC)
+
+# Conan 2.x compatibility
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/build")
+include(${CMAKE_BINARY_DIR}/build/conan_toolchain.cmake)
+find_package(fmt REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(nng REQUIRED)
+find_package(rxcpp REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(SQLite3 REQUIRED)
+find_package(tabulate REQUIRED)
+
+# pybind11 - using local source
+add_subdirectory(.deps/pybind11-2.9.0)
 
 ##########################################################################
 
@@ -60,6 +72,5 @@ endif()
 
 if (NOT DEFINED ENV{KUNGFU_BUILD_SKIP_PYKUNGFU} OR NOT $ENV{KUNGFU_BUILD_SKIP_PYKUNGFU})
   message(STATUS "Enabled pykungfu")
-  add_subdirectory(.deps/pybind11-2.9.0)
   add_subdirectory(src/bindings/python)
 endif()

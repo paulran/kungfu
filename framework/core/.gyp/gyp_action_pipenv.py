@@ -27,6 +27,12 @@ class Pipenv(object):
         return list(map(self.find_version, Pipenv.SEED_PACKAGES))
 
 
-Shell.run(["yarn", "pipenv", "--bare", "install"])
-Shell.run(["yarn", "pipenv", "install"] + Pipenv().seed_packages)
-Shell.touch("Pipfile.lock")
+# Check if Pipfile.lock already exists and just touch it to avoid pipenv requirement
+import os
+pipfile_lock_path = os.path.join(Shell.core_dir, "Pipfile.lock")
+if os.path.exists(pipfile_lock_path):
+    Shell.touch("Pipfile.lock")
+else:
+    Shell.run(["yarn", "pipenv", "--bare", "install"])
+    Shell.run(["yarn", "pipenv", "install"] + Pipenv().seed_packages)
+    Shell.touch("Pipfile.lock")

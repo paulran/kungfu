@@ -112,7 +112,13 @@ endif()
 # VERSION. VERSION will typically be like "2.7" on unix, and "27" on windows.
 execute_process(
   COMMAND
-    "${PYTHON_EXECUTABLE}" "-c" "from distutils import sysconfig as s;import sys;import struct;
+    "${PYTHON_EXECUTABLE}" "-c" "import sys;import struct;
+try:
+    from distutils import sysconfig as s
+except ImportError:
+    import sysconfig as s
+    s.get_python_inc = lambda plat_specific=False: s.get_path('include')
+    s.get_python_lib = lambda plat_specific=False: s.get_path('platlib')
 print('.'.join(str(v) for v in sys.version_info));
 print(sys.prefix);
 print(s.get_python_inc(plat_specific=True));

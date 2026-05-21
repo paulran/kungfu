@@ -178,7 +178,13 @@ const shell = {
     }
     shell.run(
       'yarn',
-      ['install', '--frozen-lockfile', '--network-timeout=1000000', '--silent'],
+      [
+        'install',
+        '--frozen-lockfile',
+        '--network-timeout=1000000',
+        '--silent',
+        '--ignore-engines',
+      ],
       true,
       {
         silent: true,

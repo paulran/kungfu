@@ -5,8 +5,7 @@ const path = require('path');
 const { shell } = require('../lib');
 
 function conan(cmd) {
-  const pipenv_args = ['run', 'conan', ...cmd];
-  shell.run('pipenv', pipenv_args, true, {
+  shell.run('conan', cmd, true, {
     env: { NODE_GYP_RUN: 'on', ...process.env },
   });
 }
@@ -19,11 +18,19 @@ function getNodeVersionOptions() {
   const nodeVersion = packageJson.devDependencies['@kungfu-trader/libnode'];
   return [
     '-o',
-    `electron_version=${electronVersion}`,
+    `electron_version=${electronVersion.replace('^', '')}`,
     '-o',
     `node_version=${nodeVersion}`,
     '-o',
     'with_yarn=True',
+    '-o',
+    'vs_toolset=v143',
+    '-o',
+    'log_level=info',
+    '-o',
+    'arch=x64',
+    '-o',
+    'freezer=pyinstaller',
   ];
 }
 
@@ -49,7 +56,7 @@ function conanInstall() {
   conan([
     'install',
     '.',
-    '-if',
+    '-of',
     'build',
     '--build',
     'missing',
@@ -60,19 +67,22 @@ function conanInstall() {
 
 function conanBuild() {
   const settings = makeConanSettings(['build_type']);
-  conan(['build', '.', '-bf', 'build', ...settings]);
+  const options = getNodeVersionOptions();
+  conan(['build', '.', '-of', 'build', ...settings, ...options]);
 }
 
 function conanPackage() {
   const conanSettings = makeConanSettings(['build_type']);
+  const options = getNodeVersionOptions();
   conan([
     'package',
     '.',
-    '-bf',
+    '-of',
     'build',
     '-pf',
     path.join('dist', 'kfc'),
     ...conanSettings,
+    ...options,
   ]);
 }
 

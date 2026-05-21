@@ -71,10 +71,10 @@
   },
   "devDependencies": {
     "@kungfu-trader/kungfu-toolchain": "^2.4.77",
-    "@kungfu-trader/libnode": "16.15.0",
+    "@kungfu-trader/libnode": "file:.deps/libnode",
     "cmake-js": "^7.0.0",
-    "electron": "19.1.8",
-    "nan": "^2.15.0",
-    "node-addon-api": "^5.0.0"
+    "electron": "^32.0.0",
+    "nan": "^2.20.0",
+    "node-addon-api": "^8.0.0"
   }
 }

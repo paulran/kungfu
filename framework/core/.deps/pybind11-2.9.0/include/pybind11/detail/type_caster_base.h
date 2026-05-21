@@ -465,21 +465,21 @@ PYBIND11_NOINLINE std::string error_string() {
         while (trace->tb_next)
             trace = trace->tb_next;
 
-        PyFrameObject *frame = trace->tb_frame;
+        PyObject *frame_obj = (PyObject *) trace->tb_frame;
         errorString += "\n\nAt:\n";
-        while (frame) {
-#if PY_VERSION_HEX >= 0x03090000
-            PyCodeObject *f_code = PyFrame_GetCode(frame);
-#else
-            PyCodeObject *f_code = frame->f_code;
-            Py_INCREF(f_code);
-#endif
-            int lineno = PyFrame_GetLineNumber(frame);
+        while (frame_obj) {
+            PyCodeObject *f_code = PyFrame_GetCode((PyFrameObject *) frame_obj);
+            int lineno = PyFrame_GetLineNumber((PyFrameObject *) frame_obj);
             errorString +=
                 "  " + handle(f_code->co_filename).cast<std::string>() +
                 "(" + std::to_string(lineno) + "): " +
                 handle(f_code->co_name).cast<std::string>() + "\n";
-            frame = frame->f_back;
+            PyFrameObject *frame = (PyFrameObject *) frame_obj;
+#if PY_VERSION_HEX >= 0x030D0000
+            frame_obj = (PyObject *) PyFrame_GetBack(frame);
+#else
+            frame_obj = (PyObject *) frame->f_back;
+#endif
             Py_DECREF(f_code);
         }
     }
